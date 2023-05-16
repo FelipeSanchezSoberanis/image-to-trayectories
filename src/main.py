@@ -13,6 +13,12 @@ def get_image_path() -> str:
     if not os.path.isfile(image_path):
         raise Exception("File not found")
 
+    supported_file_types = ".png", ".jpg"
+    if not image_path.endswith(supported_file_types):
+        raise Exception(
+            f"File type not supported, please use one of the following: {supported_file_types}"
+        )
+
     return image_path
 
 
