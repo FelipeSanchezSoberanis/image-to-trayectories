@@ -1,10 +1,12 @@
 import sys
+import random
 import numpy as np
 import numpy.typing as npt
 import os
 import cv2 as cv
 import matplotlib.pyplot as plt
 from enum import Enum
+import matplotlib.animation as ani
 
 
 class Colors(Enum):
@@ -34,6 +36,28 @@ class Trayectory:
         self.color = color
         self.x_points = x_points
         self.y_points = y_points
+
+
+class PlotAnimation:
+    def __init__(self):
+        self.x = []
+        self.y = []
+        self.fig, self.ax = plt.subplots()
+
+    def animate(self, i):
+        pt = random.randint(1, 9)
+
+        self.x.append(i)
+        self.y.append(pt)
+
+        self.ax.clear()
+        self.ax.plot(self.x, self.y)
+        self.ax.set_xlim([0, 20])
+        self.ax.set_ylim([0, 10])
+
+    def start(self):
+        _ = ani.FuncAnimation(self.fig, self.animate, frames=20, interval=16, repeat=False)
+        plt.show()
 
 
 def get_image() -> cv.Mat:
@@ -100,17 +124,22 @@ def get_trayectories(
     return trayectories
 
 
-def main():
-    image = get_image()
-    contours_per_color = get_contours_per_color(image)
-    trayectories = get_trayectories(image, contours_per_color)
-
+def plot_trayectories(image: cv.Mat, trayectories: list[Trayectory]) -> None:
     for trayectory in trayectories:
         plt.xlim([0, image.shape[0]])
         plt.ylim([0, image.shape[1]])
         plt.axis(False)
         plt.plot(trayectory.x_points, trayectory.y_points, trayectory.color.to_hex())
     plt.show()
+
+
+def main():
+    #  image = get_image()
+    #  contours_per_color = get_contours_per_color(image)
+    #  trayectories = get_trayectories(image, contours_per_color)
+    #  plot_trayectories(image, trayectories)
+    animation = PlotAnimation()
+    animation.start()
 
 
 if __name__ == "__main__":
