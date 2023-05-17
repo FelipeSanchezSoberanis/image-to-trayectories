@@ -1,5 +1,4 @@
 import sys
-import random
 from matplotlib.axes import Axes
 from matplotlib.figure import Figure
 import numpy as np
@@ -62,8 +61,8 @@ class PlotAnimation:
         self.axes.clear()
         self.axes.axis(False)
         self.axes.plot(self.x_points[0 : i + 1], self.y_points[0 : i + 1])
-        self.axes.set_xlim([0, self.image.shape[0]])
-        self.axes.set_ylim([0, self.image.shape[1]])
+        self.axes.set_xlim(xmin=0, xmax=self.image.shape[0])
+        self.axes.set_ylim(ymin=0, ymax=self.image.shape[1])
 
     def start(self):
         _ = ani.FuncAnimation(
