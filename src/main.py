@@ -12,7 +12,7 @@ class Colors(Enum):
     GREEN = 1
     BLUE = 2
 
-    def to_color(self) -> str:
+    def to_hex(self) -> str:
         if self == Colors.RED:
             return "#ff0000"
         elif self == Colors.GREEN:
@@ -106,7 +106,7 @@ def main():
     for trayectory in trayectories:
         plt.xlim([0, 500])
         plt.ylim([0, 500])
-        plt.plot(trayectory.x_points, trayectory.y_points, trayectory.color.to_color())
+        plt.plot(trayectory.x_points, trayectory.y_points, trayectory.color.to_hex())
     plt.show()
 
 
