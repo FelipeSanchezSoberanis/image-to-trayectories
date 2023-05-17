@@ -1,5 +1,4 @@
 import sys
-import typing
 import numpy as np
 import numpy.typing as npt
 import os
@@ -85,14 +84,14 @@ def get_contours_per_color(image: cv.Mat) -> dict[Colors, tuple]:
 
 
 def get_trayectories(image: cv.Mat, contours_per_color: dict[Colors, tuple]) -> list[Trayectory]:
-    cols = image.shape[1]
+    height = image.shape[1]
 
     trayectories: list[Trayectory] = []
 
     for color in Colors:
         for contour in contours_per_color[color]:
             x_points = contour[:, :, 0]
-            y_points = cols - contour[:, :, 1]
+            y_points = height - contour[:, :, 1]
 
             trayectories.append(Trayectory(color, x_points, y_points))
 
@@ -105,6 +104,8 @@ def main():
     trayectories = get_trayectories(image, contours_per_color)
 
     for trayectory in trayectories:
+        plt.xlim([0, 500])
+        plt.ylim([0, 500])
         plt.plot(trayectory.x_points, trayectory.y_points, trayectory.color.to_color())
     plt.show()
 
