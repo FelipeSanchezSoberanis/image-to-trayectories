@@ -1,5 +1,7 @@
 import sys
 import random
+from matplotlib.axes import Axes
+from matplotlib.figure import Figure
 import numpy as np
 import numpy.typing as npt
 import os
@@ -39,24 +41,34 @@ class Trayectory:
 
 
 class PlotAnimation:
-    def __init__(self):
-        self.x = []
-        self.y = []
-        self.fig, self.ax = plt.subplots()
+    x_points: list[np.int32]
+    y_points: list[np.int32]
+    figure: Figure
+    axes: Axes
+    image: cv.Mat
+
+    def __init__(self, image: cv.Mat, trayectories: list[Trayectory]):
+        self.image = image
+        self.figure, self.axes = plt.subplots()
+        self.x_points = []
+        self.y_points = []
+
+        for trayectory in trayectories:
+            for x, y in zip(trayectory.x_points, trayectory.y_points):
+                self.x_points.append(x)
+                self.y_points.append(y)
 
     def animate(self, i):
-        pt = random.randint(1, 9)
-
-        self.x.append(i)
-        self.y.append(pt)
-
-        self.ax.clear()
-        self.ax.plot(self.x, self.y)
-        self.ax.set_xlim([0, 20])
-        self.ax.set_ylim([0, 10])
+        self.axes.clear()
+        self.axes.axis(False)
+        self.axes.plot(self.x_points[0 : i + 1], self.y_points[0 : i + 1])
+        self.axes.set_xlim([0, self.image.shape[0]])
+        self.axes.set_ylim([0, self.image.shape[1]])
 
     def start(self):
-        _ = ani.FuncAnimation(self.fig, self.animate, frames=20, interval=16, repeat=False)
+        _ = ani.FuncAnimation(
+            self.figure, self.animate, frames=len(self.x_points), interval=0, repeat=False
+        )
         plt.show()
 
 
@@ -134,11 +146,11 @@ def plot_trayectories(image: cv.Mat, trayectories: list[Trayectory]) -> None:
 
 
 def main():
-    #  image = get_image()
-    #  contours_per_color = get_contours_per_color(image)
-    #  trayectories = get_trayectories(image, contours_per_color)
-    #  plot_trayectories(image, trayectories)
-    animation = PlotAnimation()
+    image = get_image()
+    contours_per_color = get_contours_per_color(image)
+    trayectories = get_trayectories(image, contours_per_color)
+    plot_trayectories(image, trayectories)
+    animation = PlotAnimation(image, trayectories)
     animation.start()
 
 
