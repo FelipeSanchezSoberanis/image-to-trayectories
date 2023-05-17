@@ -25,11 +25,11 @@ class Colors(Enum):
 
 class Trayectory:
     color: Colors
-    x_points: npt.NDArray[np.uint16]
-    y_points: npt.NDArray[np.uint16]
+    x_points: npt.NDArray[np.int32]
+    y_points: npt.NDArray[np.int32]
 
     def __init__(
-        self, color: Colors, x_points: npt.NDArray[np.uint16], y_points: npt.NDArray[np.uint16]
+        self, color: Colors, x_points: npt.NDArray[np.int32], y_points: npt.NDArray[np.int32]
     ):
         self.color = color
         self.x_points = x_points
@@ -73,8 +73,8 @@ def create_mask_for_color(image: cv.Mat, color: Colors) -> npt.NDArray[np.bool_]
     return np.bitwise_and(red_mask, green_mask, blue_mask)
 
 
-def get_contours_per_color(image: cv.Mat) -> dict[Colors, tuple]:
-    contours_per_color: dict[Colors, tuple] = {}
+def get_contours_per_color(image: cv.Mat) -> dict[Colors, tuple[npt.NDArray[np.int32], ...]]:
+    contours_per_color: dict[Colors, tuple[npt.NDArray[np.int32]]] = {}
     for color in Colors:
         color_mask = create_mask_for_color(image, color)
         thresh = (color_mask * 255).astype(np.uint8)
@@ -83,7 +83,9 @@ def get_contours_per_color(image: cv.Mat) -> dict[Colors, tuple]:
     return contours_per_color
 
 
-def get_trayectories(image: cv.Mat, contours_per_color: dict[Colors, tuple]) -> list[Trayectory]:
+def get_trayectories(
+    image: cv.Mat, contours_per_color: dict[Colors, tuple[npt.NDArray[np.int32], ...]]
+) -> list[Trayectory]:
     height = image.shape[1]
 
     trayectories: list[Trayectory] = []
@@ -104,8 +106,9 @@ def main():
     trayectories = get_trayectories(image, contours_per_color)
 
     for trayectory in trayectories:
-        plt.xlim([0, 500])
-        plt.ylim([0, 500])
+        plt.xlim([0, image.shape[0]])
+        plt.ylim([0, image.shape[1]])
+        plt.axis(False)
         plt.plot(trayectory.x_points, trayectory.y_points, trayectory.color.to_hex())
     plt.show()
 
