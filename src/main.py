@@ -48,7 +48,8 @@ class PlotAnimation:
 
     def __init__(self, image: cv.Mat, trayectories: list[Trayectory]):
         self.image = image
-        self.figure, self.axes = plt.subplots()
+        self.figure = plt.figure()
+        self.axes = plt.axes(projection="3d")
         self.x_points = []
         self.y_points = []
 
@@ -59,8 +60,13 @@ class PlotAnimation:
 
     def animate(self, i):
         self.axes.clear()
-        self.axes.axis(False)
         self.axes.plot(self.x_points[0 : i + 1], self.y_points[0 : i + 1])
+        self.axes.plot(
+            [int(self.x_points[i]) for _ in range(50)],
+            [int(self.y_points[i]) for _ in range(50)],
+            np.linspace(0, max(self.image.shape[0:2])),
+            "#000000",
+        )
         self.axes.set_xlim(xmin=0, xmax=self.image.shape[0])
         self.axes.set_ylim(ymin=0, ymax=self.image.shape[1])
 
