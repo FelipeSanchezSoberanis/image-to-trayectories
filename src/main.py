@@ -1,13 +1,13 @@
+from enum import Enum
+import os
 import sys
+import cv2 as cv
+import matplotlib.animation as ani
 from matplotlib.axes import Axes
 from matplotlib.figure import Figure
+import matplotlib.pyplot as plt
 import numpy as np
 import numpy.typing as npt
-import os
-import cv2 as cv
-import matplotlib.pyplot as plt
-from enum import Enum
-import matplotlib.animation as ani
 
 
 class Colors(Enum):
