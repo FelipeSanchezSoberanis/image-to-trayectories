@@ -69,10 +69,6 @@ class PlotAnimation:
         )
         self.axes.set_xlim(xmin=0, xmax=self.image.shape[0])
         self.axes.set_ylim(ymin=0, ymax=self.image.shape[1])
-        if i % 10 == 0:
-            self.figure.savefig(
-                os.path.join("animation", f"frame-{str(i).zfill(len(str(len(self.x_points))))}.png")
-            )
 
     def start(self):
         _ = ani.FuncAnimation(
