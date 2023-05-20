@@ -10,10 +10,39 @@ import numpy as np
 import numpy.typing as npt
 
 
+class Commands(Enum):
+    TOOL_UP = 0
+    TOOL_DOWN = 1
+    MOVE_TO = 2
+    CHANGE_COLOR = 3
+
+    def to_string(self):
+        if self == Commands.TOOL_UP:
+            return "TOOL_UP"
+        elif self == Commands.TOOL_DOWN:
+            return "TOOL_DOWN"
+        elif self == Commands.MOVE_TO:
+            return "MOVE_TO"
+        elif self == Commands.CHANGE_COLOR:
+            return "CHANGE_COLOR"
+        else:
+            raise Exception("Enum not valid")
+
+
 class Colors(Enum):
     RED = 0
     GREEN = 1
     BLUE = 2
+
+    def to_command(self) -> str:
+        if self == Colors.RED:
+            return "RED"
+        elif self == Colors.GREEN:
+            return "GREEN"
+        elif self == Colors.BLUE:
+            return "BLUE"
+        else:
+            raise Exception("Enum not valid")
 
     def to_hex(self) -> str:
         if self == Colors.RED:
@@ -154,9 +183,30 @@ def main():
     image = get_image()
     contours_per_color = get_contours_per_color(image)
     trayectories = get_trayectories(image, contours_per_color)
-    plot_trayectories(image, trayectories)
-    animation = PlotAnimation(image, trayectories)
-    animation.start()
+    for i, trayectory in enumerate(trayectories):
+        if i == 0:
+            x, y = int(trayectory.x_points[0]), int(trayectory.y_points[0])
+
+            print(Commands.CHANGE_COLOR.to_string(), trayectory.color.to_command())
+            print(Commands.MOVE_TO.to_string(), x, y)
+            print(Commands.TOOL_DOWN.to_string())
+
+            print("Here print all coordinates for this trayectory")
+
+            print(Commands.TOOL_UP.to_string())
+        else:
+            color_changed = trayectories[i].color != trayectories[i - 1].color
+            if color_changed:
+                print(Commands.CHANGE_COLOR.to_string(), trayectory.color.to_command())
+
+            x, y = int(trayectory.x_points[0]), int(trayectory.y_points[0])
+            print(Commands.MOVE_TO.to_string(), x, y)
+            print(Commands.TOOL_DOWN.to_string())
+
+            print("Here print all coordinates for this trayectory")
+
+            print(Commands.TOOL_UP.to_string())
+    print("END")
 
 
 if __name__ == "__main__":
