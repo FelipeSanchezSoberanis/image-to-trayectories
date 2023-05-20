@@ -194,7 +194,8 @@ def main():
         print(Commands.MOVE_TO.to_string(), x, y)
         print(Commands.TOOL_DOWN.to_string())
 
-        print("Here print all coordinates for this trayectory")
+        for x, y in zip(trayectory.x_points, trayectory.y_points):
+            print(Commands.MOVE_TO.to_string(), int(x), int(y))
 
         print(Commands.TOOL_UP.to_string())
 
