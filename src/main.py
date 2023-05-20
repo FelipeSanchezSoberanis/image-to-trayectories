@@ -184,28 +184,20 @@ def main():
     contours_per_color = get_contours_per_color(image)
     trayectories = get_trayectories(image, contours_per_color)
     for i, trayectory in enumerate(trayectories):
-        if i == 0:
-            x, y = int(trayectory.x_points[0]), int(trayectory.y_points[0])
-
+        first_trayectory = i <= 0
+        color_changed = not first_trayectory and trayectories[i].color != trayectories[i - 1].color
+        if first_trayectory or color_changed:
             print(Commands.CHANGE_COLOR.to_string(), trayectory.color.to_command())
-            print(Commands.MOVE_TO.to_string(), x, y)
-            print(Commands.TOOL_DOWN.to_string())
 
-            print("Here print all coordinates for this trayectory")
+        x, y = int(trayectory.x_points[0]), int(trayectory.y_points[0])
 
-            print(Commands.TOOL_UP.to_string())
-        else:
-            color_changed = trayectories[i].color != trayectories[i - 1].color
-            if color_changed:
-                print(Commands.CHANGE_COLOR.to_string(), trayectory.color.to_command())
+        print(Commands.MOVE_TO.to_string(), x, y)
+        print(Commands.TOOL_DOWN.to_string())
 
-            x, y = int(trayectory.x_points[0]), int(trayectory.y_points[0])
-            print(Commands.MOVE_TO.to_string(), x, y)
-            print(Commands.TOOL_DOWN.to_string())
+        print("Here print all coordinates for this trayectory")
 
-            print("Here print all coordinates for this trayectory")
+        print(Commands.TOOL_UP.to_string())
 
-            print(Commands.TOOL_UP.to_string())
     print("END")
 
 
