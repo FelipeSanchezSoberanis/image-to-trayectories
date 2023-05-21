@@ -175,7 +175,7 @@ def get_port() -> str:
     return port
 
 
-def get_baud_rate() -> int:
+def get_baudrate() -> int:
     if not len(sys.argv) >= 4:
         raise Exception("Baudrate not provided")
 
@@ -183,6 +183,10 @@ def get_baud_rate() -> int:
         return int(sys.argv[3])
     except Exception:
         raise Exception("Baudrate could not be converted to integer")
+
+
+def get_arguments() -> tuple[cv.matrix, str, int]:
+    return get_image(), get_port(), get_baudrate()
 
 
 def create_mask_for_color(image: cv.Mat, color: Colors) -> npt.NDArray[np.bool_]:
@@ -238,12 +242,13 @@ def plot_trayectories(image: cv.Mat, trayectories: list[Trayectory]) -> None:
 
 
 def main():
-    image = get_image()
-    port = get_port()
-    baudrate = get_baud_rate()
+    image, port, baudrate = get_arguments()
+
     contours_per_color = get_contours_per_color(image)
     trayectories = get_trayectories(image, contours_per_color)
+
     cm = CommandManager(port, baudrate)
+
     for i, trayectory in enumerate(trayectories):
         first_trayectory = i <= 0
         color_changed = not first_trayectory and trayectories[i].color != trayectories[i - 1].color
