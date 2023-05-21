@@ -185,7 +185,7 @@ def get_baudrate() -> int:
         raise Exception("Baudrate could not be converted to integer")
 
 
-def get_arguments() -> tuple[cv.matrix, str, int]:
+def get_arguments() -> tuple[cv.Mat, str, int]:
     return get_image(), get_port(), get_baudrate()
 
 
@@ -247,25 +247,27 @@ def main():
     contours_per_color = get_contours_per_color(image)
     trayectories = get_trayectories(image, contours_per_color)
 
-    cm = CommandManager(port, baudrate)
+    plot_trayectories(image, trayectories)
 
-    for i, trayectory in enumerate(trayectories):
-        first_trayectory = i <= 0
-        color_changed = not first_trayectory and trayectories[i].color != trayectories[i - 1].color
-        if first_trayectory or color_changed:
-            cm.change_color(trayectory.color)
+    #  cm = CommandManager(port, baudrate)
 
-        x, y = int(trayectory.x_points[0]), int(trayectory.y_points[0])
+    #  for i, trayectory in enumerate(trayectories):
+    #      first_trayectory = i <= 0
+    #      color_changed = not first_trayectory and trayectories[i].color != trayectories[i - 1].color
+    #      if first_trayectory or color_changed:
+    #          cm.change_color(trayectory.color)
 
-        cm.move_to(x, y)
-        cm.tool_down()
+    #      x, y = int(trayectory.x_points[0]), int(trayectory.y_points[0])
 
-        for x, y in zip(trayectory.x_points[1:], trayectory.y_points[1:]):
-            cm.move_to(int(x), int(y))
+    #      cm.move_to(x, y)
+    #      cm.tool_down()
 
-        cm.tool_up()
+    #      for x, y in zip(trayectory.x_points[1:], trayectory.y_points[1:]):
+    #          cm.move_to(int(x), int(y))
 
-    cm.end()
+    #      cm.tool_up()
+
+    #  cm.end()
 
 
 if __name__ == "__main__":
