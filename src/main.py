@@ -215,7 +215,7 @@ def main():
         cm.move_to(x, y)
         cm.tool_down()
 
-        for x, y in zip(trayectory.x_points, trayectory.y_points):
+        for x, y in zip(trayectory.x_points[1:], trayectory.y_points[1:]):
             cm.move_to(int(x), int(y))
 
         cm.tool_up()
