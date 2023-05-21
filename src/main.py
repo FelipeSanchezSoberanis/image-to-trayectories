@@ -143,7 +143,7 @@ class PlotAnimation:
 
 
 def get_image() -> cv.Mat:
-    if not len(sys.argv) == 2:
+    if not len(sys.argv) >= 2:
         raise Exception("Image path not provided")
 
     image_path = sys.argv[1]
@@ -161,6 +161,28 @@ def get_image() -> cv.Mat:
     image = cv.cvtColor(image, cv.COLOR_BGR2RGB)
 
     return image
+
+
+def get_port() -> str:
+    if not len(sys.argv) >= 3:
+        raise Exception("Serial port not provided")
+
+    port = sys.argv[2]
+
+    if not os.path.exists(port):
+        raise Exception("Port not valid")
+
+    return port
+
+
+def get_baud_rate() -> int:
+    if not len(sys.argv) >= 4:
+        raise Exception("Baudrate not provided")
+
+    try:
+        return int(sys.argv[3])
+    except Exception:
+        raise Exception("Baudrate could not be converted to integer")
 
 
 def create_mask_for_color(image: cv.Mat, color: Colors) -> npt.NDArray[np.bool_]:
@@ -217,9 +239,11 @@ def plot_trayectories(image: cv.Mat, trayectories: list[Trayectory]) -> None:
 
 def main():
     image = get_image()
+    port = get_port()
+    baudrate = get_baud_rate()
     contours_per_color = get_contours_per_color(image)
     trayectories = get_trayectories(image, contours_per_color)
-    cm = CommandManager("/dev/pts/4", 9600)
+    cm = CommandManager(port, baudrate)
     for i, trayectory in enumerate(trayectories):
         first_trayectory = i <= 0
         color_changed = not first_trayectory and trayectories[i].color != trayectories[i - 1].color
