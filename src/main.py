@@ -10,25 +10,6 @@ import numpy as np
 import numpy.typing as npt
 
 
-class Commands(Enum):
-    TOOL_UP = 0
-    TOOL_DOWN = 1
-    MOVE_TO = 2
-    CHANGE_COLOR = 3
-
-    def to_string(self):
-        if self == Commands.TOOL_UP:
-            return "TOOL_UP"
-        elif self == Commands.TOOL_DOWN:
-            return "TOOL_DOWN"
-        elif self == Commands.MOVE_TO:
-            return "MOVE_TO"
-        elif self == Commands.CHANGE_COLOR:
-            return "CHANGE_COLOR"
-        else:
-            raise Exception("Enum not valid")
-
-
 class Colors(Enum):
     RED = 0
     GREEN = 1
@@ -51,6 +32,45 @@ class Colors(Enum):
             return "#00ff00"
         elif self == Colors.BLUE:
             return "#0000ff"
+        else:
+            raise Exception("Enum not valid")
+
+
+class CommandManager:
+    def end(self):
+        print(Commands.END.to_string())
+
+    def tool_up(self):
+        print(Commands.TOOL_UP.to_string())
+
+    def tool_down(self):
+        print(Commands.TOOL_DOWN.to_string())
+
+    def move_to(self, x: int, y: int):
+        print(Commands.MOVE_TO.to_string(), x, y)
+
+    def change_color(self, color: Colors):
+        print(Commands.CHANGE_COLOR.to_string(), color.to_command())
+
+
+class Commands(Enum):
+    TOOL_UP = 0
+    TOOL_DOWN = 1
+    MOVE_TO = 2
+    CHANGE_COLOR = 3
+    END = 4
+
+    def to_string(self):
+        if self == Commands.TOOL_UP:
+            return "TOOL_UP"
+        elif self == Commands.TOOL_DOWN:
+            return "TOOL_DOWN"
+        elif self == Commands.MOVE_TO:
+            return "MOVE_TO"
+        elif self == Commands.CHANGE_COLOR:
+            return "CHANGE_COLOR"
+        elif self == Commands.END:
+            return "END"
         else:
             raise Exception("Enum not valid")
 
@@ -183,23 +203,24 @@ def main():
     image = get_image()
     contours_per_color = get_contours_per_color(image)
     trayectories = get_trayectories(image, contours_per_color)
+    cm = CommandManager()
     for i, trayectory in enumerate(trayectories):
         first_trayectory = i <= 0
         color_changed = not first_trayectory and trayectories[i].color != trayectories[i - 1].color
         if first_trayectory or color_changed:
-            print(Commands.CHANGE_COLOR.to_string(), trayectory.color.to_command())
+            cm.change_color(trayectory.color)
 
         x, y = int(trayectory.x_points[0]), int(trayectory.y_points[0])
 
-        print(Commands.MOVE_TO.to_string(), x, y)
-        print(Commands.TOOL_DOWN.to_string())
+        cm.move_to(x, y)
+        cm.tool_down()
 
         for x, y in zip(trayectory.x_points, trayectory.y_points):
-            print(Commands.MOVE_TO.to_string(), int(x), int(y))
+            cm.move_to(int(x), int(y))
 
-        print(Commands.TOOL_UP.to_string())
+        cm.tool_up()
 
-    print("END")
+    cm.end()
 
 
 if __name__ == "__main__":
