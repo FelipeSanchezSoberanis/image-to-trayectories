@@ -1,4 +1,5 @@
 from enum import Enum
+import time
 import os
 import sys
 import cv2 as cv
@@ -8,6 +9,7 @@ from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
 import numpy as np
 import numpy.typing as npt
+from serial import Serial
 
 
 class Colors(Enum):
@@ -37,20 +39,34 @@ class Colors(Enum):
 
 
 class CommandManager:
+    serial: Serial
+
+    def __init__(self, port: str, baudrate: int):
+        self.serial = Serial()
+        self.serial.port = port
+        self.serial.baudrate = baudrate
+        self.serial.open()
+
+    def write_to_serial(self, input: str):
+        self.serial.write(bytes(input + "\r\n", "utf-8"))
+        time.sleep(1)
+
     def end(self):
-        print(Commands.END.to_string())
+        self.write_to_serial(Commands.END.to_string())
 
     def tool_up(self):
-        print(Commands.TOOL_UP.to_string())
+        self.write_to_serial(Commands.TOOL_UP.to_string())
 
     def tool_down(self):
-        print(Commands.TOOL_DOWN.to_string())
+        self.write_to_serial(Commands.TOOL_DOWN.to_string())
 
     def move_to(self, x: int, y: int):
-        print(Commands.MOVE_TO.to_string(), x, y)
+        command = f"{Commands.MOVE_TO.to_string()} {x} {y}"
+        self.write_to_serial(command)
 
     def change_color(self, color: Colors):
-        print(Commands.CHANGE_COLOR.to_string(), color.to_command())
+        command = f"{Commands.CHANGE_COLOR.to_string()} {color.to_command()}"
+        self.write_to_serial(command)
 
 
 class Commands(Enum):
@@ -203,7 +219,7 @@ def main():
     image = get_image()
     contours_per_color = get_contours_per_color(image)
     trayectories = get_trayectories(image, contours_per_color)
-    cm = CommandManager()
+    cm = CommandManager("/dev/pts/4", 9600)
     for i, trayectory in enumerate(trayectories):
         first_trayectory = i <= 0
         color_changed = not first_trayectory and trayectories[i].color != trayectories[i - 1].color
