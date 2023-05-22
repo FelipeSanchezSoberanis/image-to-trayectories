@@ -41,21 +41,21 @@ class Colors(Enum):
 
 class CommandManager:
     serial: Serial
+    termination_command: str
 
     def __init__(self, port: str, baudrate: int):
+        self.termination_command = "DONE"
         self.serial = Serial()
         self.serial.port = port
         self.serial.baudrate = baudrate
-        self.serial.parity = serial.PARITY_EVEN
-        self.serial.stopbits = serial.STOPBITS_ONE
-        self.serial.bytesize = serial.EIGHTBITS
         self.serial.open()
-        time.sleep(3)
+        time.sleep(2)
 
     def write_to_serial(self, input: str):
         self.serial.write(input.encode("utf-8"))
-        print(input)
-        time.sleep(0.1)
+        res = self.serial.read_until(self.termination_command.encode("utf-8")).decode("utf-8")
+        for line in res.strip().split("\n"):
+            print(line)
 
     def end(self):
         self.write_to_serial(Commands.END.to_string())

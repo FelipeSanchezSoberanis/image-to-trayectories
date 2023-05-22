@@ -1,13 +1,14 @@
-import serial
-from main import Commands, CommandManager, Colors
+from main import Colors, CommandManager
 
 
 def main():
-    arduino = serial.Serial("/dev/ttyUSB0", 9600)
-    for i in range(109):
-        command = "ON" if i % 2 == 0 else "OFF"
-        arduino.write(command.encode("utf-8"))
-        arduino.read_until("DONE".encode("utf-8"))
+    cm = CommandManager("/dev/ttyUSB0", 9600)
+    cm.move_to(100, 200)
+    cm.move_to(300, 500)
+    cm.change_color(Colors.RED)
+    cm.change_color(Colors.BLUE)
+    cm.tool_up()
+    cm.tool_down()
 
 
 if __name__ == "__main__":
