@@ -1,5 +1,6 @@
 from enum import Enum
 import time
+import serial
 import os
 import sys
 import cv2 as cv
@@ -45,11 +46,16 @@ class CommandManager:
         self.serial = Serial()
         self.serial.port = port
         self.serial.baudrate = baudrate
+        self.serial.parity = serial.PARITY_EVEN
+        self.serial.stopbits = serial.STOPBITS_ONE
+        self.serial.bytesize = serial.EIGHTBITS
         self.serial.open()
+        time.sleep(3)
 
     def write_to_serial(self, input: str):
-        self.serial.write(bytes(input + "\r\n", "utf-8"))
-        time.sleep(1)
+        self.serial.write(input.encode("utf-8"))
+        print(input)
+        time.sleep(0.1)
 
     def end(self):
         self.write_to_serial(Commands.END.to_string())
@@ -247,27 +253,27 @@ def main():
     contours_per_color = get_contours_per_color(image)
     trayectories = get_trayectories(image, contours_per_color)
 
-    plot_trayectories(image, trayectories)
+    #  plot_trayectories(image, trayectories)
 
-    #  cm = CommandManager(port, baudrate)
+    cm = CommandManager(port, baudrate)
 
-    #  for i, trayectory in enumerate(trayectories):
-    #      first_trayectory = i <= 0
-    #      color_changed = not first_trayectory and trayectories[i].color != trayectories[i - 1].color
-    #      if first_trayectory or color_changed:
-    #          cm.change_color(trayectory.color)
+    for i, trayectory in enumerate(trayectories):
+        first_trayectory = i <= 0
+        color_changed = not first_trayectory and trayectories[i].color != trayectories[i - 1].color
+        if first_trayectory or color_changed:
+            cm.change_color(trayectory.color)
 
-    #      x, y = int(trayectory.x_points[0]), int(trayectory.y_points[0])
+        x, y = int(trayectory.x_points[0]), int(trayectory.y_points[0])
 
-    #      cm.move_to(x, y)
-    #      cm.tool_down()
+        cm.move_to(x, y)
+        cm.tool_down()
 
-    #      for x, y in zip(trayectory.x_points[1:], trayectory.y_points[1:]):
-    #          cm.move_to(int(x), int(y))
+        for x, y in zip(trayectory.x_points[1:], trayectory.y_points[1:]):
+            cm.move_to(int(x), int(y))
 
-    #      cm.tool_up()
+        cm.tool_up()
 
-    #  cm.end()
+    cm.end()
 
 
 if __name__ == "__main__":
