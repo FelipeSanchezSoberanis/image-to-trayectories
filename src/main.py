@@ -215,7 +215,7 @@ def get_contours_per_color(image: cv.Mat) -> dict[Colors, tuple[npt.NDArray[np.i
     for color in Colors:
         color_mask = create_mask_for_color(image, color)
         thresh = (color_mask * 255).astype(np.uint8)
-        contours, _ = cv.findContours(thresh, cv.RETR_TREE, cv.CHAIN_APPROX_NONE)
+        contours, _ = cv.findContours(thresh, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_NONE)
         contours_per_color[color] = contours
     return contours_per_color
 
@@ -252,7 +252,7 @@ def main():
     contours_per_color = get_contours_per_color(image)
     trayectories = get_trayectories(image, contours_per_color)
 
-    #  plot_trayectories(image, trayectories)
+    plot_trayectories(image, trayectories)
 
     cm = CommandManager(port, baudrate)
 
@@ -275,6 +275,9 @@ def main():
             cm.move_to(int(x), int(y))
 
         cm.tool_up()
+
+    cm.move_to(0, 0)
+    cm.tool_down()
 
     cm.end()
 
