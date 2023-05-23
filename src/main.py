@@ -1,4 +1,5 @@
 from enum import Enum
+import numpy
 import time
 import serial
 import os
@@ -49,7 +50,7 @@ class CommandManager:
         self.serial.port = port
         self.serial.baudrate = baudrate
         self.serial.open()
-        time.sleep(2)
+        time.sleep(5)
 
     def write_to_serial(self, input: str):
         self.serial.write(input.encode("utf-8"))
@@ -263,12 +264,16 @@ def main():
         if first_trayectory or color_changed:
             cm.change_color(trayectory.color)
 
-        x, y = int(trayectory.x_points[0]), int(trayectory.y_points[0])
+        x_points: list[int] = list(np.interp(trayectory.x_points, (0, 500), (0, 8_000)).astype(int))
+        y_points: list[int] = list(np.interp(trayectory.y_points, (0, 500), (0, 8_000)).astype(int))
 
-        cm.move_to(x, y)
+        x, y = x_points[0], y_points[0]
+
+        cm.move_to(int(x), int(y))
+
         cm.tool_down()
 
-        for x, y in zip(trayectory.x_points[1:], trayectory.y_points[1:]):
+        for x, y in zip(x_points[1:], y_points[1:]):
             cm.move_to(int(x), int(y))
 
         cm.tool_up()
