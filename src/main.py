@@ -1,7 +1,5 @@
 from enum import Enum
-import numpy
 import time
-import serial
 import os
 import sys
 import cv2 as cv
